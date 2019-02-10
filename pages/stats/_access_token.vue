@@ -79,9 +79,9 @@ export default {
   },
   data() {
     return {
-      display_name: '',
-      image_url: '',
-      email: '',
+      // display_name: '',
+      // image_url: '',
+      // email: '',
       personalization: {
         favourite_tracks: {
           data: [],
@@ -116,15 +116,17 @@ export default {
   },
   asyncData({ params }) {
     access_token = params.access_token
+    axios(options_handler('https://api.spotify.com/v1/me')).then(response => {
+      return {
+        display_name : response.data.display_name,
+        image_url : response.data.images[0].url,
+        email : response.data.email
+      }
+    })
   },
 
   mounted() {
     loadProgressBar()
-    axios(options_handler('https://api.spotify.com/v1/me')).then(response => {
-      this.display_name = response.data.display_name
-      this.image_url = response.data.images[0].url
-      this.email = response.data.email
-    })
     this.get_recently_play().then(this.reterive_audio_feature)
     this.get_favourite_tracks().then(this.reterive_audio_feature)
   },
