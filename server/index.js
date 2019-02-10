@@ -28,8 +28,8 @@ async function start() {
 
   var client_id = '5a2e5002bd5d42cda6a7b9a49fc309be' // Your client id
   var client_secret = '130db0a21423462c8a0d205fb9c45193' // Your secret
-  var redirect_uri = 'https://spotifystat.herokuapp.com/auth/callback' // Your redirect uri
-
+  // var redirect_uri = 'https://spotifystat.herokuapp.com/auth/callback' // Your redirect uri
+  var redirect_uri = 'http://localhost:3000/auth/callback'
   var generateRandomString = function(length) {
     var text = ''
     var possible =
@@ -100,17 +100,17 @@ async function start() {
           var access_token = body.access_token,
             refresh_token = body.refresh_token
 
-          var options = {
-            url: 'https://api.spotify.com/v1/me',
-            headers: { Authorization: 'Bearer ' + access_token },
-            json: true
-          }
+          // var options = {
+          //   url: 'https://api.spotify.com/v1/me',
+          //   headers: { Authorization: 'Bearer ' + access_token },
+          //   json: true
+          // }
 
-          // use the access token to access the Spotify Web API
-          request.get(options, function(error, response, body) {
-            console.log(body)
-            console.log(error)
-          })
+          // // use the access token to access the Spotify Web API
+          // request.get(options, function(error, response, body) {
+          //   console.log(body)
+          //   console.log(error)
+          // })
 
           // we can also pass the token to the browser to make requests from there
           res.redirect(
