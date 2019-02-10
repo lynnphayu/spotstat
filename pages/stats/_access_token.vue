@@ -88,10 +88,10 @@ export default {
           selected: false,
           handler: this.get_favourite_tracks
         },
-        favourite_artists: {
+        top_artists: {
           data: [],
           selected: false,
-          handler: this.get_favourite_artists
+          handler: this.get_top_artists
         },
         recently_played: {
           data: [],
@@ -116,7 +116,7 @@ export default {
   },
   asyncData({ params }) {
     access_token = params.access_token
-    axios(options_handler('https://api.spotify.com/v1/me')).then(response => {
+    return axios(options_handler('https://api.spotify.com/v1/me')).then(response => {
       return {
         display_name : response.data.display_name,
         image_url : response.data.images[0].url,
@@ -127,6 +127,11 @@ export default {
 
   mounted() {
     loadProgressBar()
+    // axios(options_handler('https://api.spotify.com/v1/me')).then(response => {
+    //   this.display_name = response.data.display_name
+    //   this.image_url = response.data.images[0].url
+    //   this.email = response.data.email
+    // })
     this.get_recently_play().then(this.reterive_audio_feature)
     this.get_favourite_tracks().then(this.reterive_audio_feature)
   },
@@ -150,14 +155,14 @@ export default {
       })
       
     },
-    get_favourite_artists() {
-      if (this.personalization.favourite_artists.data.length == 0)
+    get_top_artists() {
+      if (this.personalization.top_artists.data.length == 0)
         axios(
           options_handler('https://api.spotify.com/v1/me/top/artists', {
             limit: 15
           })
         ).then(response => {
-          this.personalization.favourite_artists.data = response.data.items
+          this.personalization.top_artists.data = response.data.items
         })
     },
     get_recently_play() {
