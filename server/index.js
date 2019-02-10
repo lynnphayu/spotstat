@@ -29,7 +29,7 @@ async function start() {
 
   var client_id = '5a2e5002bd5d42cda6a7b9a49fc309be' // Your client id
   var client_secret = '130db0a21423462c8a0d205fb9c45193' // Your secret
-  var redirect_uri = (process.env.NODE_ENV === 'production') ? 'https://spotifystat.herokuapp.com' :'http://localhost:3000/auth/callback' // Your redirect uri
+  var redirect_uri = (process.env.NODE_ENV === 'production') ? 'https://spotifystat.herokuapp.com/auth/callback' :'http://localhost:3000/auth/callback' // Your redirect uri
 
   var generateRandomString = function(length) {
     var text = ''
