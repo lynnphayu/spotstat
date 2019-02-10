@@ -28,8 +28,8 @@ async function start() {
 
   var client_id = '5a2e5002bd5d42cda6a7b9a49fc309be' // Your client id
   var client_secret = '130db0a21423462c8a0d205fb9c45193' // Your secret
-  // var redirect_uri = 'https://spotifystat.herokuapp.com/auth/callback' // Your redirect uri
-  var redirect_uri = 'http://localhost:3000/auth/callback'
+  var redirect_uri = 'https://spotifystat.herokuapp.com/auth/callback' // Your redirect uri
+  // var redirect_uri = 'http://localhost:3000/auth/callback'
   var generateRandomString = function(length) {
     var text = ''
     var possible =
