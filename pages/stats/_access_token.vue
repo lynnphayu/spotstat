@@ -119,7 +119,7 @@ export default {
     return axios(options_handler('https://api.spotify.com/v1/me')).then(response => {
       return {
         display_name : response.data.display_name,
-        image_url : response.data.images[0].url,
+        image_url : response.data.images[0] ? response.data.images[0].url : '',
         email : response.data.email
       }
     })
