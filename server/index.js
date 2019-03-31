@@ -7,29 +7,25 @@ const cors = require('cors')
 const querystring = require('querystring')
 const cookieParser = require('cookie-parser')
 
-// Import and Set Nuxt.js options
 let config = require('../nuxt.config.js')
 config.dev = !(process.env.NODE_ENV === 'production')
 
 async function start() {
-  // Init Nuxt.js
   const nuxt = new Nuxt(config)
 
   const {
-    port = process.env.PORT || 3000,
-    // host = '192.168.8.105',
+    port = process.env.PORT || 5000,
   } = nuxt.options.server
 
-  // Build only in dev mode
   if (config.dev) {
     const builder = new Builder(nuxt)
     await builder.build()
   }
 
-  var client_id = '5a2e5002bd5d42cda6a7b9a49fc309be' // Your client id
-  var client_secret = '130db0a21423462c8a0d205fb9c45193' // Your secret
+  var client_id = '5a2e5002bd5d42cda6a7b9a49fc309be' // client id
+  var client_secret = '130db0a21423462c8a0d205fb9c45193' // secret
   var redirect_uri = 'https://spotifystat.herokuapp.com/auth/callback' // Your redirect uri
-  // var redirect_uri = 'http://localhost:5000/auth/callback'
+
   var generateRandomString = function(length) {
     var text = ''
     var possible =
@@ -42,7 +38,8 @@ async function start() {
   }
 
   var stateKey = 'spotify_auth_state'
-  // Give nuxt middleware to express
+  var token = 'access_token'
+
   app
     .use(cors())
     .use(cookieParser())
@@ -51,7 +48,6 @@ async function start() {
     var state = generateRandomString(16)
     res.cookie(stateKey, state)
 
-    // your application requests authorization
     var scope = 'user-read-private user-read-email user-top-read user-follow-read user-read-recently-played'
     res.redirect(
       'https://accounts.spotify.com/authorize?' +
@@ -100,22 +96,12 @@ async function start() {
           var access_token = body.access_token,
             refresh_token = body.refresh_token
 
-          // var options = {
-          //   url: 'https://api.spotify.com/v1/me',
-          //   headers: { Authorization: 'Bearer ' + access_token },
-          //   json: true
-          // }
-
-          // // use the access token to access the Spotify Web API
-          // request.get(options, function(error, response, body) {
-          //   console.log(body)
-          //   console.log(error)
-          // })
-
-          // we can also pass the token to the browser to make requests from there
           res.redirect(
             '/stats/' +access_token
           )
+          // res.cookie('access_token' ,access_token);
+          // res.redirect('/')
+
         } else {
           res.redirect(
             '/' +
@@ -154,7 +140,7 @@ async function start() {
       }
     })
   })
-  // Listen the server
+
   app.use(nuxt.render)
   app.listen(port)
   consola.ready({
