@@ -24,7 +24,7 @@ async function start() {
 
   var client_id = '5a2e5002bd5d42cda6a7b9a49fc309be' // client id
   var client_secret = '130db0a21423462c8a0d205fb9c45193' // secret
-  var redirect_uri = 'https://spotifystat.herokuapp.com/auth/callback' // Your redirect uri
+  var redirect_uri = 'https://spotifystat.herokuapp.com/callback' // Your redirect uri
 
   var generateRandomString = function(length) {
     var text = ''
@@ -114,32 +114,56 @@ async function start() {
     }
   })
 
-  app.post('/refresh_token', function(req, res) {
-    // requesting access token from refresh token
-    var refresh_token = req.query.refresh_token
-    var authOptions = {
-      url: 'https://accounts.spotify.com/api/token',
-      headers: {
-        Authorization:
-          'Basic ' +
-          new Buffer(client_id + ':' + client_secret).toString('base64')
-      },
-      form: {
-        grant_type: 'refresh_token',
-        refresh_token: refresh_token
-      },
-      json: true
-    }
+  app.get('/callback', function(req, res) {
 
-    request.post(authOptions, function(error, response, body) {
-      if (!error && response.statusCode === 200) {
-        var access_token = body.access_token
-        res.send({
-          access_token: access_token
-        })
+    var code = req.query.code || null
+    var state = req.query.state || null
+    var storedState = req.cookies ? req.cookies[stateKey] : null
+
+    if (state === null || state !== storedState) {
+      res.redirect(
+        '/#' +
+          querystring.stringify({
+            error: 'state_mismatch'
+          })
+      )
+    } else {
+      res.clearCookie(stateKey)
+      var authOptions = {
+        url: 'https://accounts.spotify.com/api/token',
+        form: {
+          code: code,
+          redirect_uri: redirect_uri,
+          grant_type: 'authorization_code'
+        },
+        headers: {
+          Authorization:
+            'Basic ' +
+            new Buffer(client_id + ':' + client_secret).toString('base64')
+        },
+        json: true
       }
-    })
+
+      request.post(authOptions, function(error, response, body) {
+        if (!error && response.statusCode === 200) {
+          var access_token = body.access_token,
+            refresh_token = body.refresh_token
+
+          res.cookie('access_token' ,access_token);
+          res.redirect('/')
+
+        } else {
+          res.redirect(
+            '/' +
+              querystring.stringify({
+                error: 'invalid_token'
+              })
+          )
+        }
+      })
+    }
   })
+
 
   app.use(nuxt.render)
   app.listen(port)

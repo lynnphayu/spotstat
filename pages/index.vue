@@ -45,7 +45,6 @@
         </div>
       </div>
     </div>
-  </div>
 </template>
 
 <script>
@@ -116,7 +115,7 @@ export default {
     }
   },
   asyncData({ params }) {
-    access_token = params.access_token
+    access_token = req.headers.access_token
     return axios(options_handler('https://api.spotify.com/v1/me')).then(response => {
       return {
         display_name : response.data.display_name,
