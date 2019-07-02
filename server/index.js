@@ -139,7 +139,7 @@ async function start() {
         headers: {
           Authorization:
             'Basic ' +
-            Buffer.from(client_id + ':' + client_secret,'base64')
+            Buffer.from(client_id + ':' + client_secret).toString('base64')
         },
         json: true
       }
