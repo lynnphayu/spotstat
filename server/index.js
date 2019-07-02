@@ -24,7 +24,7 @@ async function start() {
 
   var client_id = '5a2e5002bd5d42cda6a7b9a49fc309be' // client id
   var client_secret = '130db0a21423462c8a0d205fb9c45193' // secret
-  var redirect_uri = 'http://localhost:5000/callback/' // Your redirect uri
+  var redirect_uri = 'https://spotifystat.herokuapp.com/callback/' // Your redirect uri
 
   var generateRandomString = function(length) {
     var text = ''
@@ -44,7 +44,7 @@ async function start() {
     .use(cors())
     .use(cookieParser())
 
-  app.get('/auth/login', function(req, res) {
+  app.get('/get_token', function(req, res) {
     var state = generateRandomString(16)
     res.cookie(stateKey, state)
 
@@ -149,7 +149,8 @@ async function start() {
           var access_token = body.access_token,
             refresh_token = body.refresh_token
 
-          res.cookie('access_token' ,access_token);
+          console.log(access_token)
+          res.cookie('access_token' ,access_token, { expires: new Date(Date.now() + 2000)});
           res.redirect('/')
 
         } else {

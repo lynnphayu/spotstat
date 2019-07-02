@@ -1,6 +1,6 @@
 export default function ({ store, redirect }) {
-	console.log(Cookie.get('access_token'))
-	if (Cookie.get('access_token')) {
-	  return redirect('/auth')
+	console.log(document.cookie)
+	if (!document.cookie) {
+	  return redirect('https://spotifystat.herokuapp.com//get_token')
 	}
   }
