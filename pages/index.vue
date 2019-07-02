@@ -114,7 +114,7 @@ export default {
       }
     }
   },
-  asyncData({ params }) {
+  asyncData({ query,req }) {
     access_token = req.headers.access_token
     return axios(options_handler('https://api.spotify.com/v1/me')).then(response => {
       return {

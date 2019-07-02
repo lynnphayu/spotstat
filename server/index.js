@@ -150,7 +150,6 @@ async function start() {
             refresh_token = body.refresh_token
 
           res.cookie('access_token' ,access_token);
-          console.log('everything works fine before redirect')
           res.redirect('/')
 
         } else {
