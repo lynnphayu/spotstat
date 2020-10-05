@@ -27,7 +27,7 @@
                 v-bind:class="{ 'is-active': stats_radar.selected }"
                 v-on:click="tap"
               >
-                <a>stats_radar</a>
+                <a>Statistics</a>
               </li>
               <li
                 v-for="tab in Object.keys(personalization)"
@@ -42,10 +42,10 @@
             <list :data="listdata"></list>
           </div>
           <div class="content" v-show="stats_radar.selected">
-            <p>Recent Taste</p>
+            <p>Recent</p>
             <radarvue :data="stats_radar.recent_tracks"></radarvue>
             <div class="is-divider"></div>
-            <p>All time Taste</p>
+            <p>All time</p>
             <radarvue :data="stats_radar.all_time_tracks"></radarvue>
           </div>
         </div>
@@ -90,17 +90,17 @@ export default {
       // image_url: '',
       // email: '',
       personalization: {
-        favourite_tracks: {
+        'Favourite Tracks': {
           data: [],
           selected: false,
           handler: this.get_favourite_tracks
         },
-        top_artists: {
+        'Top Artists': {
           data: [],
           selected: false,
           handler: this.get_top_artists
         },
-        recently_played: {
+        'Recently Played': {
           data: [],
           selected: false,
           handler: this.get_recently_play
@@ -124,13 +124,11 @@ export default {
   asyncData({ query, req }) {
     access_token = document.cookie.slice(document.cookie.indexOf('=') + 1)
     return axios(options_handler('https://api.spotify.com/v1/me')).then(
-      ({ data: { display_name, images, email } }) => {
-        return {
-          display_name,
-          email,
-          image_url: images[0] ? images[0].url : ''
-        }
-      }
+      ({ data: { display_name, images, email } }) => ({
+        display_name,
+        email,
+        image_url: images[0] ? images[0].url : ''
+      })
     )
   },
 
@@ -147,36 +145,32 @@ export default {
   methods: {
     get_favourite_tracks() {
       return new Promise((resolve, reject) => {
-        if (this.personalization.favourite_tracks.data.length == 0)
+        if (this.personalization['Favourite Tracks'].data.length == 0)
           axios(
             options_handler('https://api.spotify.com/v1/me/top/tracks', {
               limit: 15
             })
-          ).then(response => {
-            this.personalization.favourite_tracks.data = response.data.items
-            this.stats_radar.all_time_tracks.id = response.data.items.map(
-              el => {
-                return el.id
-              }
-            )
+          ).then(({ data: { items } }) => {
+            this.personalization['Favourite Tracks'].data = items
+            this.stats_radar.all_time_tracks.id = items.map(el => el.id)
             resolve(this.stats_radar.all_time_tracks)
           })
         else resolve('Done.')
       })
     },
     get_top_artists() {
-      if (this.personalization.top_artists.data.length == 0)
+      if (this.personalization['Top Artists'].data.length == 0)
         axios(
           options_handler('https://api.spotify.com/v1/me/top/artists', {
             limit: 15
           })
         ).then(response => {
-          this.personalization.top_artists.data = response.data.items
+          this.personalization['Top Artists'].data = response.data.items
         })
     },
     get_recently_play() {
       return new Promise((resolve, reject) => {
-        if (this.personalization.recently_played.data.length == 0)
+        if (this.personalization['Recently Played'].data.length == 0)
           axios(
             options_handler(
               'https://api.spotify.com/v1/me/player/recently-played',
@@ -184,13 +178,11 @@ export default {
                 limit: 15
               }
             )
-          ).then(response => {
-            this.personalization.recently_played.data = response.data.items.map(
-              el => {
-                return el.track
-              }
-            )
-            this.stats_radar.recent_tracks.id = response.data.items.map(el => {
+          ).then(({ data: { items } }) => {
+            this.personalization['Recently Played'].data = items.map(el => {
+              return el.track
+            })
+            this.stats_radar.recent_tracks.id = items.map(el => {
               return el.track.id
             })
             resolve(this.stats_radar.recent_tracks)
@@ -199,7 +191,7 @@ export default {
       })
     },
     tap(event) {
-      if (event.target.text !== 'stats_radar') {
+      if (event.target.text !== 'Statistics') {
         for (var key in this.personalization)
           if (key !== event.target.text)
             this.personalization[key].selected = false
@@ -210,9 +202,7 @@ export default {
         this.stats_radar.selected = false
       } else {
         this.stats_radar.selected = true
-        Object.values(this.personalization).forEach(el => {
-          el.selected = false
-        })
+        Object.values(this.personalization).forEach(el => (el.selected = false))
       }
     },
     reterive_audio_feature(id_list) {
@@ -252,9 +242,7 @@ export default {
           return (sum[i] += el[i])
         })
       })
-      return sum.map(el => {
-        return el / data_arr.length
-      })
+      return sum.map(el => el / data_arr.length)
     }
   },
   computed: {}
