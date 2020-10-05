@@ -25,9 +25,9 @@ const options_handler = (url, data) => {
     url: url,
     headers: { Authorization: 'Bearer ' + access_token },
     params: data,
-    paramsSerializer: function(params) {
+    paramsSerializer: function (params) {
       return qs.stringify(params, { arrayFormat: 'brackets' })
-    }
+    },
   }
 }
 
@@ -36,7 +36,7 @@ export default {
   data() {},
 
   mounted() {},
-  computed: {}
+  computed: {},
 }
 </script>
 

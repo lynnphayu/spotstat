@@ -26,7 +26,7 @@ async function start() {
   var client_secret = '130db0a21423462c8a0d205fb9c45193' // secret
   var redirect_uri = 'https://spotifystat.herokuapp.com/callback/' // Your redirect uri
 
-  var generateRandomString = function(length) {
+  var generateRandomString = function (length) {
     var text = ''
     var possible =
       'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
@@ -40,28 +40,27 @@ async function start() {
   var stateKey = 'spotify_auth_state'
   var token = 'access_token'
 
-  app
-    .use(cors())
+  app.use(cors())
     .use(cookieParser())
 
-  app.get('/get_token', function(req, res) {
+  app.get('/get_token', function (req, res) {
     var state = generateRandomString(16)
     res.cookie(stateKey, state)
 
     var scope = 'user-read-private user-read-email user-top-read user-follow-read user-read-recently-played'
     res.redirect(
       'https://accounts.spotify.com/authorize?' +
-        querystring.stringify({
-          response_type: 'code',
-          client_id: client_id,
-          scope: scope,
-          redirect_uri: redirect_uri,
-          state: state
-        })
+      querystring.stringify({
+        response_type: 'code',
+        client_id: client_id,
+        scope: scope,
+        redirect_uri: redirect_uri,
+        state: state
+      })
     )
   })
 
-  app.get('/auth/callback', function(req, res) {
+  app.get('/auth/callback', function (req, res) {
 
     var code = req.query.code || null
     var state = req.query.state || null
@@ -70,9 +69,9 @@ async function start() {
     if (state === null || state !== storedState) {
       res.redirect(
         '/#' +
-          querystring.stringify({
-            error: 'state_mismatch'
-          })
+        querystring.stringify({
+          error: 'state_mismatch'
+        })
       )
     } else {
       res.clearCookie(stateKey)
@@ -91,13 +90,13 @@ async function start() {
         json: true
       }
 
-      request.post(authOptions, function(error, response, body) {
+      request.post(authOptions, function (error, response, body) {
         if (!error && response.statusCode === 200) {
           var access_token = body.access_token,
             refresh_token = body.refresh_token
 
           res.redirect(
-            '/stats/' +access_token
+            '/stats/' + access_token
           )
           // res.cookie('access_token' ,access_token);
           // res.redirect('/')
@@ -105,16 +104,16 @@ async function start() {
         } else {
           res.redirect(
             '/' +
-              querystring.stringify({
-                error: 'invalid_token'
-              })
+            querystring.stringify({
+              error: 'invalid_token'
+            })
           )
         }
-      })
+      });
     }
   })
 
-  app.get('/callback', function(req, res) {
+  app.get('/callback', function (req, res) {
 
     var code = req.query.code || null
     var state = req.query.state || null
@@ -123,9 +122,9 @@ async function start() {
     if (state === null || state !== storedState) {
       res.redirect(
         '/#' +
-          querystring.stringify({
-            error: 'state_mismatch'
-          })
+        querystring.stringify({
+          error: 'state_mismatch'
+        })
       )
     } else {
       res.clearCookie(stateKey)
@@ -144,21 +143,20 @@ async function start() {
         json: true
       }
 
-      request.post(authOptions, function(error, response, body) {
+      request.post(authOptions, function (error, response, body) {
         if (!error && response.statusCode === 200) {
           var access_token = body.access_token,
             refresh_token = body.refresh_token
 
-          console.log(access_token)
-          res.cookie('access_token' ,access_token, { expires: new Date(Date.now() + 2000)});
+          res.cookie('access_token', access_token, { expires: new Date(Date.now() + 2000) });
           res.redirect('/')
 
         } else {
           res.redirect(
             '/' +
-              querystring.stringify({
-                error: 'invalid_token'
-              })
+            querystring.stringify({
+              error: 'invalid_token'
+            })
           )
         }
       })

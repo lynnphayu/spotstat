@@ -8,23 +8,30 @@
           <div class="media">
             <div class="media-left">
               <figure class="image is-96x96">
-                <img class="is-rounded" :src="image_url" alt="Placeholder image">
+                <img
+                  class="is-rounded"
+                  :src="image_url"
+                  alt="Placeholder image"
+                />
               </figure>
             </div>
             <div class="media-content">
-              <p class="title is-4">{{display_name}}</p>
-              <p class="subtitle is-6">{{email}}</p>
+              <p class="title is-4">{{ display_name }}</p>
+              <p class="subtitle is-6">{{ email }}</p>
             </div>
           </div>
 
           <div class="tabs">
             <ul>
-              <li v-bind:class="{'is-active': stats_radar.selected}" v-on:click="tap">
+              <li
+                v-bind:class="{ 'is-active': stats_radar.selected }"
+                v-on:click="tap"
+              >
                 <a>stats_radar</a>
               </li>
               <li
                 v-for="tab in Object.keys(personalization)"
-                v-bind:class="{'is-active': personalization[tab].selected}"
+                v-bind:class="{ 'is-active': personalization[tab].selected }"
                 v-on:click="tap"
               >
                 <a>{{ tab }}</a>
@@ -34,17 +41,17 @@
           <div v-for="listdata in Object.values(personalization)">
             <list :data="listdata"></list>
           </div>
-          <div class="content" v-show="stats_radar.selected">  
+          <div class="content" v-show="stats_radar.selected">
             <p>Recent Taste</p>
-            <radarvue :data="stats_radar.recent_tracks" ></radarvue>
+            <radarvue :data="stats_radar.recent_tracks"></radarvue>
             <div class="is-divider"></div>
             <p>All time Taste</p>
             <radarvue :data="stats_radar.all_time_tracks"></radarvue>
           </div>
-          </div>
         </div>
       </div>
     </div>
+  </div>
 </template>
 
 <script>
@@ -101,12 +108,12 @@ export default {
       },
       stats_radar: {
         recent_tracks: {
-          id:[],
+          id: [],
           audio_features: [],
           recap: []
         },
         all_time_tracks: {
-          id:[],
+          id: [],
           audio_features: [],
           recap: []
         },
@@ -114,15 +121,17 @@ export default {
       }
     }
   },
-  asyncData({ query,req }) {
-    access_token = document.cookie.slice(document.cookie.indexOf("=")+1,)
-    return axios(options_handler('https://api.spotify.com/v1/me')).then(response => {
-      return {
-        display_name : response.data.display_name,
-        image_url : response.data.images[0] ? response.data.images[0].url : '',
-        email : response.data.email
+  asyncData({ query, req }) {
+    access_token = document.cookie.slice(document.cookie.indexOf('=') + 1)
+    return axios(options_handler('https://api.spotify.com/v1/me')).then(
+      ({ data: { display_name, images, email } }) => {
+        return {
+          display_name,
+          email,
+          image_url: images[0] ? images[0].url : ''
+        }
       }
-    })
+    )
   },
 
   mounted() {
@@ -137,23 +146,23 @@ export default {
   },
   methods: {
     get_favourite_tracks() {
-      return new Promise((resolve,reject) => {
-      if (this.personalization.favourite_tracks.data.length == 0)
-        axios(
-          options_handler('https://api.spotify.com/v1/me/top/tracks', {
-            limit: 15
+      return new Promise((resolve, reject) => {
+        if (this.personalization.favourite_tracks.data.length == 0)
+          axios(
+            options_handler('https://api.spotify.com/v1/me/top/tracks', {
+              limit: 15
+            })
+          ).then(response => {
+            this.personalization.favourite_tracks.data = response.data.items
+            this.stats_radar.all_time_tracks.id = response.data.items.map(
+              el => {
+                return el.id
+              }
+            )
+            resolve(this.stats_radar.all_time_tracks)
           })
-        ).then(response => {
-          this.personalization.favourite_tracks.data = response.data.items
-          this.stats_radar.all_time_tracks.id = response.data.items.map( (el) =>{
-            return el.id
-          })
-          resolve(this.stats_radar.all_time_tracks)
-        })
-        else
-          resolve("Done.")
+        else resolve('Done.')
       })
-      
     },
     get_top_artists() {
       if (this.personalization.top_artists.data.length == 0)
@@ -166,7 +175,7 @@ export default {
         })
     },
     get_recently_play() {
-      return new Promise((resolve,reject) => {
+      return new Promise((resolve, reject) => {
         if (this.personalization.recently_played.data.length == 0)
           axios(
             options_handler(
@@ -181,14 +190,12 @@ export default {
                 return el.track
               }
             )
-            this.stats_radar.recent_tracks.id = response.data.items.map( (el) => {
-                return el.track.id
-              }
-            )
+            this.stats_radar.recent_tracks.id = response.data.items.map(el => {
+              return el.track.id
+            })
             resolve(this.stats_radar.recent_tracks)
           })
-        else 
-          resolve('Done.')
+        else resolve('Done.')
       })
     },
     tap(event) {
@@ -218,9 +225,9 @@ export default {
         options_handler('https://api.spotify.com/v1/audio-features', {
           ids: tracks_id_string
         })
-      ).then(response => {
+      ).then(({ data: { audio_features } }) => {
         var features = []
-        response.data.audio_features.forEach(el => {
+        audio_features.forEach(el => {
           features.push([
             el.acousticness,
             el.danceability,
@@ -232,27 +239,25 @@ export default {
           ])
         })
         id_list.audio_features = features
-        id_list.recap =  this.get_audio_feature_mean(features)
+        id_list.recap = this.get_audio_feature_mean(features)
         this.$emit('stats_loaded')
       })
     },
     get_audio_feature_mean(data_arr) {
-      var sum = new Array(data_arr[0].length).fill(0);
+      var sum = new Array(data_arr[0].length).fill(0)
       var el
-      data_arr.forEach((el)=>{
-        sum.forEach((ele,i) => {
+      data_arr.forEach(el => {
+        sum.forEach((ele, i) => {
           // console.log("sum " + i + " : "+sum[i] + " + "+el[i])
-          return sum[i] += el[i]
-        }) 
+          return (sum[i] += el[i])
+        })
       })
-      return sum.map((el) => {
-        return el/data_arr.length
+      return sum.map(el => {
+        return el / data_arr.length
       })
     }
   },
-  computed:{
-    
-  }
+  computed: {}
 }
 </script>
 

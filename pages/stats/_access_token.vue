@@ -20,13 +20,11 @@
           <div class="tabs">
             <ul>
               <li v-bind:class="{'is-active': stats_radar.selected}" v-on:click="tap">
-                <a>stats_radar</a>
+                <a>Statistics Radar</a>
               </li>
-              <li
-                v-for="tab in Object.keys(personalization)"
+              <li v-for="tab in Object.keys(personalization)"
                 v-bind:class="{'is-active': personalization[tab].selected}"
-                v-on:click="tap"
-              >
+                v-on:click="tap">
                 <a>{{ tab }}</a>
               </li>
             </ul>
@@ -35,10 +33,10 @@
             <list :data="listdata"></list>
           </div>
           <div class="content" v-show="stats_radar.selected">  
-            <p>Recent Taste</p>
+            <p>Recent</p>
             <radarvue :data="stats_radar.recent_tracks" ></radarvue>
             <div class="is-divider"></div>
-            <p>All time Taste</p>
+            <p>All time</p>
             <radarvue :data="stats_radar.all_time_tracks"></radarvue>
           </div>
           </div>
@@ -101,12 +99,12 @@ export default {
       },
       stats_radar: {
         recent_tracks: {
-          id:[],
+          id: [],
           audio_features: [],
           recap: []
         },
         all_time_tracks: {
-          id:[],
+          id: [],
           audio_features: [],
           recap: []
         },
@@ -116,13 +114,15 @@ export default {
   },
   asyncData({ params }) {
     access_token = params.access_token
-    return axios(options_handler('https://api.spotify.com/v1/me')).then(response => {
-      return {
-        display_name : response.data.display_name,
-        image_url : response.data.images[0] ? response.data.images[0].url : '',
-        email : response.data.email
+    return axios(options_handler('https://api.spotify.com/v1/me')).then(
+      response => {
+        return {
+          display_name: response.data.display_name,
+          image_url: response.data.images[0] ? response.data.images[0].url : '',
+          email: response.data.email
+        }
       }
-    })
+    )
   },
 
   mounted() {
@@ -137,23 +137,23 @@ export default {
   },
   methods: {
     get_favourite_tracks() {
-      return new Promise((resolve,reject) => {
-      if (this.personalization.favourite_tracks.data.length == 0)
-        axios(
-          options_handler('https://api.spotify.com/v1/me/top/tracks', {
-            limit: 15
+      return new Promise((resolve, reject) => {
+        if (this.personalization.favourite_tracks.data.length == 0)
+          axios(
+            options_handler('https://api.spotify.com/v1/me/top/tracks', {
+              limit: 15
+            })
+          ).then(response => {
+            this.personalization.favourite_tracks.data = response.data.items
+            this.stats_radar.all_time_tracks.id = response.data.items.map(
+              el => {
+                return el.id
+              }
+            )
+            resolve(this.stats_radar.all_time_tracks)
           })
-        ).then(response => {
-          this.personalization.favourite_tracks.data = response.data.items
-          this.stats_radar.all_time_tracks.id = response.data.items.map( (el) =>{
-            return el.id
-          })
-          resolve(this.stats_radar.all_time_tracks)
-        })
-        else
-          resolve("Done.")
+        else resolve('Done.')
       })
-      
     },
     get_top_artists() {
       if (this.personalization.top_artists.data.length == 0)
@@ -166,7 +166,7 @@ export default {
         })
     },
     get_recently_play() {
-      return new Promise((resolve,reject) => {
+      return new Promise((resolve, reject) => {
         if (this.personalization.recently_played.data.length == 0)
           axios(
             options_handler(
@@ -181,14 +181,12 @@ export default {
                 return el.track
               }
             )
-            this.stats_radar.recent_tracks.id = response.data.items.map( (el) => {
-                return el.track.id
-              }
-            )
+            this.stats_radar.recent_tracks.id = response.data.items.map(el => {
+              return el.track.id
+            })
             resolve(this.stats_radar.recent_tracks)
           })
-        else 
-          resolve('Done.')
+        else resolve('Done.')
       })
     },
     tap(event) {
@@ -232,27 +230,25 @@ export default {
           ])
         })
         id_list.audio_features = features
-        id_list.recap =  this.get_audio_feature_mean(features)
+        id_list.recap = this.get_audio_feature_mean(features)
         this.$emit('stats_loaded')
       })
     },
     get_audio_feature_mean(data_arr) {
-      var sum = new Array(data_arr[0].length).fill(0);
+      var sum = new Array(data_arr[0].length).fill(0)
       var el
-      data_arr.forEach((el)=>{
-        sum.forEach((ele,i) => {
+      data_arr.forEach(el => {
+        sum.forEach((ele, i) => {
           // console.log("sum " + i + " : "+sum[i] + " + "+el[i])
-          return sum[i] += el[i]
-        }) 
+          return (sum[i] += el[i])
+        })
       })
-      return sum.map((el) => {
-        return el/data_arr.length
+      return sum.map(el => {
+        return el / data_arr.length
       })
     }
   },
-  computed:{
-    
-  }
+  computed: {}
 }
 </script>
 
